@@ -233,6 +233,15 @@ static int image_table_env_setup(void)
 #ifdef CONFIG_BOARD_EARLY_INIT_F
 int board_early_init_f(void)
 {
+#ifdef CONFIG_HW_WDT_DIS_MIO
+  /* Assert HW_WDT_DIS */
+  zynq_slcr_unlock();
+  writel(MIO_CFG_OUTPUT, &slcr_base->mio_pin[CONFIG_HW_WDT_DIS_MIO]);
+  zynq_slcr_lock();
+  zynq_gpio_cfg_output(CONFIG_HW_WDT_DIS_MIO);
+  zynq_gpio_output_write(CONFIG_HW_WDT_DIS_MIO, 1);
+#endif
+
 #ifdef CONFIG_DISABLE_CONSOLE
   gd->flags |= GD_FLG_DISABLE_CONSOLE;
 #endif
@@ -312,17 +321,6 @@ int board_late_init(void)
 		setenv("modeboot", "");
 		break;
 	}
-
-#ifdef CONFIG_HW_WDT_DIS_MIO
-#ifndef CONFIG_SPL_BUILD
-  /* Assert HW_WDT_DIS */
-  zynq_slcr_unlock();
-  writel(MIO_CFG_OUTPUT, &slcr_base->mio_pin[CONFIG_HW_WDT_DIS_MIO]);
-  zynq_slcr_lock();
-  zynq_gpio_cfg_output(CONFIG_HW_WDT_DIS_MIO);
-  zynq_gpio_output_write(CONFIG_HW_WDT_DIS_MIO, 1);
-#endif
-#endif
 
 #ifdef CONFIG_IMAGE_TABLE_BOOT
 #ifndef CONFIG_TPL_BUILD
