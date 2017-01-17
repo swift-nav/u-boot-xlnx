@@ -94,7 +94,7 @@
 #define CONFIG_SYS_LOAD_ADDR	0 /* default? */
 
 /* Miscellaneous configurable options */
-#define CONFIG_DISABLE_CONSOLE
+/*#define CONFIG_DISABLE_CONSOLE*/
 #define CONFIG_BOARD_EARLY_INIT_F
 #define CONFIG_BOARD_LATE_INIT
 #define CONFIG_DISPLAY_BOARDINFO
