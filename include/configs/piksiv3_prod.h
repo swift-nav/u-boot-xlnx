@@ -76,6 +76,17 @@
 
 /* Default environment */
 #define CONFIG_EXTRA_ENV_SETTINGS	\
+  "net_disable_gigabit=" \
+    "mdio write 9 0; " \
+    "mdio write 0 0; " \
+    "mdio write 0 1000; " \
+    "mdio write 22 2; " \
+    "mdio write 21 3036; " \
+    "mdio write 22 0; " \
+    "mdio write 0 0xa000; " \
+    "mdio write 22 2; " \
+    "mdio write 16 444a; " \
+    "sleep 1;\0" \
   "preboot=run img_tbl_boot\0" \
   "img_tbl_boot=" \
     "sf probe && " \
@@ -87,7 +98,7 @@
              "${img_tbl_kernel_crc} && " \
     "bootm ${img_tbl_kernel_load_address}\0"
 
-#define CONFIG_BOOTCOMMAND		""
+#define CONFIG_BOOTCOMMAND		"run net_disable_gigabit"
 
 #define CONFIG_PREBOOT
 #define CONFIG_BOOTDELAY		0 /* -1 to Disable autoboot */
