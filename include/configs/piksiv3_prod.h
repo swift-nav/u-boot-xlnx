@@ -86,7 +86,7 @@
     "mdio write 22 0; " \
     "mdio write 0 0xa000; " \
     "sleep 1;\0" \
-  "preboot=run img_tbl_boot\0" \
+  "preboot=run net_disable_gigabit && run img_tbl_boot\0" \
   "img_tbl_boot=" \
     "sf probe && " \
     "sf read ${img_tbl_kernel_load_address} " \
@@ -97,7 +97,7 @@
              "${img_tbl_kernel_crc} && " \
     "bootm ${img_tbl_kernel_load_address}\0"
 
-#define CONFIG_BOOTCOMMAND		"run net_disable_gigabit"
+#define CONFIG_BOOTCOMMAND		""
 
 #define CONFIG_PREBOOT
 #define CONFIG_BOOTDELAY		0 /* -1 to Disable autoboot */
