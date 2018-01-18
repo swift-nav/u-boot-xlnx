@@ -98,7 +98,7 @@
     "bootm ${img_tbl_kernel_load_address}\0"
 
 #define CONFIG_BOOTCOMMAND		""
-#define CONFIG_BOOTARGS "console=ttyPS1,115200 earlyprintk"
+#define CONFIG_BOOTARGS "console=ttyPS1,115200 earlyprintk=ttyPS1,115200"
 
 #define CONFIG_PREBOOT
 #define CONFIG_BOOTDELAY		1 /* -1 to Disable autoboot */
