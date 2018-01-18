@@ -100,7 +100,7 @@
 #define CONFIG_BOOTCOMMAND		""
 
 #define CONFIG_PREBOOT
-#define CONFIG_BOOTDELAY		0 /* -1 to Disable autoboot */
+#define CONFIG_BOOTDELAY		1 /* -1 to Disable autoboot */
 #define CONFIG_SYS_LOAD_ADDR	0 /* default? */
 
 /* Miscellaneous configurable options */
