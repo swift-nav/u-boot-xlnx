@@ -36,6 +36,7 @@
 #define CONFIG_IMAGE_SET_OFFSET_FAILSAFE_B 0x00140000U
 #define CONFIG_IMAGE_SET_OFFSET_STANDARD_A 0x00180000U
 #define CONFIG_IMAGE_SET_OFFSET_STANDARD_B 0x001C0000U
+#define CONFIG_IMAGE_SET_OFFSET_FAIL_COUNT 0x000C0000U
 #define CONFIG_IMAGE_SET_OFFSETS          \
     {CONFIG_IMAGE_SET_OFFSET_FAILSAFE_A,  \
      CONFIG_IMAGE_SET_OFFSET_FAILSAFE_B,  \
@@ -153,11 +154,34 @@
 /* Default environment */
 #define CONFIG_EXTRA_ENV_SETTINGS \
   "autoload=no\0" \
+  "autostart=no\0" \
   "net_disable_gigabit=" \
     "mdio write 9 0; " \
     "mdio write 0 0; " \
     "mdio write 0 1000; " \
-    "sleep 1;\0"
+    "sleep 1;\0" \
+  "ram_buffer=0x0100000\0" \
+  "image_size=0x1c00000\0" \
+  "header_size=0x0040000\0" \
+  "image_header_flash_offset=0x0180000\0" \
+  "image_spl_flash_offset=0x0280000\0" \
+  "image_images_flash_offset=0x0300000\0" \
+  "image_fail_count_flash_offset=0x00C0000\0" \
+  "image_name=PiksiMulti.bin\0" \
+  "load_image_usb=" \
+    "usb start; " \
+    "fatload usb 0:1 ${ram_buffer} ${image_name};\0" \
+  "write_image=" \
+    "sf probe; " \
+    "sf erase ${image_header_flash_offset} ${header_size}; " \
+    "sf erase ${image_spl_flash_offset} ${header_size}; " \
+    "sf erase ${image_images_flash_offset} ${image_size}; " \
+    "image_set write ${ram_buffer} ${image_header_flash_offset} ${image_spl_flash_offset} ${image_images_flash_offset};\0" \
+  "clear_fails=" \
+    "sf probe; " \
+    "mw.b ${ram_buffer} 0x00; " \
+    "sf erase ${image_fail_count_flash_offset} +${header_size}; " \
+    "sf write ${ram_buffer} ${image_fail_count_flash_offset} ${header_size};\0"
 
 /* Default environment */
 #define CONFIG_BOOTCOMMAND ""

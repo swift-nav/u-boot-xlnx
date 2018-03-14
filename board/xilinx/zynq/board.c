@@ -180,6 +180,47 @@ static int image_descriptor_get(struct spi_flash *flash, u32 image_type,
   return err;
 }
 
+#ifdef CONFIG_SPL_BUILD
+static int update_boot_fail_count(bool clear) {
+  puts("Updating boot_fail_count\n");
+  int err = 0;
+  struct spi_flash *flash;
+  flash = spi_flash_probe(CONFIG_SF_DEFAULT_BUS,
+                          CONFIG_SF_DEFAULT_CS,
+                          CONFIG_SF_DEFAULT_SPEED,
+                          CONFIG_SF_DEFAULT_MODE);
+  if (!flash) {
+    puts("SPI probe failed\n");
+    return -ENODEV;
+  }
+  u8 count_data[1];
+  err = spi_flash_read(flash, CONFIG_IMAGE_SET_OFFSET_FAIL_COUNT, sizeof(count_data),
+                       count_data);
+  if (err) {
+    puts("Failed read boot_fail_count\n");
+    return err;
+  }
+  err = spi_flash_erase(flash, CONFIG_IMAGE_SET_OFFSET_FAIL_COUNT, 256 * 1024);
+  if (err) {
+    puts("Failed erase boot_fail_count\n");
+    return err;
+  }
+  printf("before: %d", count_data[0]);
+  if (clear) {
+    count_data[0] = 0;
+  } else {
+    count_data[0]++;
+  }
+  printf("after: %d", count_data[0]);
+  err = spi_flash_write(flash, CONFIG_IMAGE_SET_OFFSET_FAIL_COUNT, sizeof(count_data), count_data);
+  if (err) {
+    puts("Failed write boot_fail_count\n");
+    return err;
+  }
+  return err;
+}
+#endif
+
 static int image_table_env_setup(void)
 {
   int err = 0;
@@ -284,6 +325,16 @@ static int tpl_image_set_check(u32 image_set_offset, image_set_t *image_set)
   }
 
   return err;
+}
+
+static bool tpl_image_check_boot_fail_count(void)
+{
+  u8 count_data[1];
+  /* Copy image set header to RAM */
+  memcpy(count_data,
+         (const void *)(QSPI_LINEAR_START + CONFIG_IMAGE_SET_OFFSET_FAIL_COUNT),
+         sizeof(count_data));
+  return count_data[0] >= CONFIG_IMAGE_SET_OFFSET_FAIL_LIMIT;
 }
 #endif
 
@@ -491,134 +542,166 @@ int spl_board_load_image(void)
 
   zynq_slcr_lock();
 
-  /* Select an image set to boot */
-  u32 image_set_offset;
-  if (failsafe) {
-    /* Load failsafe image
-     * alt = 0 : failsafe A
-     * alt = 1 : failsafe B
-     */
-    image_set_offset = alt ? CONFIG_IMAGE_SET_OFFSET_FAILSAFE_B :
-                             CONFIG_IMAGE_SET_OFFSET_FAILSAFE_A;
-  } else {
-    /* Load standard image based on sequence number
-     * alt = 0 : most recent
-     * alt = 1 : second most recent
-     */
-    image_set_t image_set_working;
+  failsafe |= tpl_image_check_boot_fail_count();
 
-    bool image_set_a_valid =
-        (tpl_image_set_check(CONFIG_IMAGE_SET_OFFSET_STANDARD_A,
-                             &image_set_working) == 0);
-    u32 image_set_a_seq_num = image_set_seq_num_get(&image_set_working);
-
-    bool image_set_b_valid =
-        (tpl_image_set_check(CONFIG_IMAGE_SET_OFFSET_STANDARD_B,
-                             &image_set_working) == 0);
-    u32 image_set_b_seq_num = image_set_seq_num_get(&image_set_working);
-
-    if (image_set_a_valid && image_set_b_valid) {
-      s32 seq_num_diff = image_set_a_seq_num - image_set_b_seq_num;
-      image_set_offset = ((seq_num_diff >= 0) != alt) ?
-                             CONFIG_IMAGE_SET_OFFSET_STANDARD_A :
-                             CONFIG_IMAGE_SET_OFFSET_STANDARD_B;
-    } else if (image_set_a_valid) {
-      image_set_offset = CONFIG_IMAGE_SET_OFFSET_STANDARD_A;
-    } else if (image_set_b_valid) {
-      image_set_offset = CONFIG_IMAGE_SET_OFFSET_STANDARD_B;
+  while (true) {
+    /* Select an image set to boot */
+    u32 image_set_offset;
+    if (failsafe) {
+      /* Load failsafe image
+      * alt = 0 : failsafe A
+      * alt = 1 : failsafe B
+      */
+      image_set_offset = alt ? CONFIG_IMAGE_SET_OFFSET_FAILSAFE_B :
+                              CONFIG_IMAGE_SET_OFFSET_FAILSAFE_A;
     } else {
-      /* No valid image set */
-      return -1;
+      /* Load standard image based on sequence number
+      * alt = 0 : most recent
+      * alt = 1 : second most recent
+      */
+      image_set_t image_set_working;
+
+      bool image_set_a_valid =
+          (tpl_image_set_check(CONFIG_IMAGE_SET_OFFSET_STANDARD_A,
+                              &image_set_working) == 0);
+      u32 image_set_a_seq_num = image_set_seq_num_get(&image_set_working);
+
+      bool image_set_b_valid =
+          (tpl_image_set_check(CONFIG_IMAGE_SET_OFFSET_STANDARD_B,
+                              &image_set_working) == 0);
+      u32 image_set_b_seq_num = image_set_seq_num_get(&image_set_working);
+
+      if (image_set_a_valid && image_set_b_valid) {
+        s32 seq_num_diff = image_set_a_seq_num - image_set_b_seq_num;
+        image_set_offset = ((seq_num_diff >= 0) != alt) ?
+                              CONFIG_IMAGE_SET_OFFSET_STANDARD_A :
+                              CONFIG_IMAGE_SET_OFFSET_STANDARD_B;
+      } else if (image_set_a_valid) {
+        image_set_offset = CONFIG_IMAGE_SET_OFFSET_STANDARD_A;
+      } else if (image_set_b_valid) {
+        image_set_offset = CONFIG_IMAGE_SET_OFFSET_STANDARD_B;
+      } else {
+        /* No valid image set */
+        if (failsafe) {
+          return -1;
+        } else {
+          failsafe = true;
+          continue;
+        }
+      }
     }
-  }
 
-  /* Load and verify selected image set */
-  image_set_t image_set;
+    /* Load and verify selected image set */
+    image_set_t image_set;
 
-  /* Copy image set header to RAM */
-  memcpy((void *)&image_set,
-         (const void *)(QSPI_LINEAR_START + image_set_offset),
-         sizeof(image_set_t));
+    /* Copy image set header to RAM */
+    memcpy((void *)&image_set,
+          (const void *)(QSPI_LINEAR_START + image_set_offset),
+          sizeof(image_set_t));
 
-  /* Verify image set header */
-  err = image_set_verify(&image_set);
-  if (err) {
-    return err;
-  }
-
-  /* Find SPL image descriptor */
-  const image_descriptor_t *image_descriptor;
-  err = image_set_descriptor_find(&image_set, IMAGE_TYPE_UBOOT_SPL,
-                                  &image_descriptor);
-  if (err) {
-    return err;
-  }
-
-  u32 image_data_offset = image_descriptor_data_offset_get(image_descriptor);
-  u32 image_data_size = image_descriptor_data_size_get(image_descriptor);
-  const u8 *image_data_flash =
-      (const u8 *)(QSPI_LINEAR_START + image_data_offset);
-
-  u32 computed_data_crc;
-  image_descriptor_data_crc_init(&computed_data_crc);
-
-  /* Copy header to RAM */
-  struct image_header header;
-  memcpy((void *)&header,
-         (const void *)image_data_flash,
-         sizeof(struct image_header));
-
-  /* Update CRC over header */
-  image_descriptor_data_crc_continue(&computed_data_crc,
-                                     (const u8 *)&header,
-                                     sizeof(struct image_header));
-
-  /* Copy data to RAM at load address, skipping over header */
-  u32 load_address = image_descriptor_load_address_get(image_descriptor);
-  memcpy((void *)load_address,
-         (const void *)&image_data_flash[sizeof(struct image_header)],
-         image_data_size - sizeof(struct image_header));
-
-  /* Update CRC over data */
-  image_descriptor_data_crc_continue(&computed_data_crc,
-                                     (const u8 *)load_address,
-                                     image_data_size -
-                                     sizeof(struct image_header));
-
-  /* Verify data CRC */
-  if (computed_data_crc != image_descriptor_data_crc_get(image_descriptor)) {
-    return -1;
-  }
-
-    /* Parse header */
-  spl_image.flags |= SPL_COPY_PAYLOAD_ONLY;
-  spl_parse_image_header(&header);
-
-  /* Determine image table index */
-  u32 image_table_index = 0;
-  bool image_table_index_found = false;
-  const u32 image_set_offsets[] = CONFIG_IMAGE_SET_OFFSETS;
-  int i;
-  for (i=0; i<sizeof(image_set_offsets) / sizeof(image_set_offsets[0]); i++) {
-    if (image_set_offsets[i] == image_set_offset) {
-      image_table_index = i;
-      image_table_index_found = true;
-      break;
+    /* Verify image set header */
+    err = image_set_verify(&image_set);
+    if (err) {
+      if (failsafe) {
+        return err;
+      } else {
+        failsafe = true;
+        continue;
+      }
     }
-  }
-  if (!image_table_index_found) {
-    return -1;
-  }
 
-  /* Write image table index to lower two bits of REBOOT_STATUS */
-  u32 reboot_status = readl(REG_REBOOT_STATUS);
-  reboot_status = (reboot_status & ~0x3) | (image_table_index & 0x3);
-  zynq_slcr_unlock();
-  writel(reboot_status, REG_REBOOT_STATUS);
-  zynq_slcr_lock();
+    /* Find SPL image descriptor */
+    const image_descriptor_t *image_descriptor;
+    err = image_set_descriptor_find(&image_set, IMAGE_TYPE_UBOOT_SPL,
+                                    &image_descriptor);
+    if (err) {
+      if (failsafe) {
+        return err;
+      } else {
+        failsafe = true;
+        continue;
+      }
+    }
+
+    u32 image_data_offset = image_descriptor_data_offset_get(image_descriptor);
+    u32 image_data_size = image_descriptor_data_size_get(image_descriptor);
+    const u8 *image_data_flash =
+        (const u8 *)(QSPI_LINEAR_START + image_data_offset);
+
+    u32 computed_data_crc;
+    image_descriptor_data_crc_init(&computed_data_crc);
+
+    /* Copy header to RAM */
+    struct image_header header;
+    memcpy((void *)&header,
+          (const void *)image_data_flash,
+          sizeof(struct image_header));
+
+    /* Update CRC over header */
+    image_descriptor_data_crc_continue(&computed_data_crc,
+                                      (const u8 *)&header,
+                                      sizeof(struct image_header));
+
+    /* Copy data to RAM at load address, skipping over header */
+    u32 load_address = image_descriptor_load_address_get(image_descriptor);
+    memcpy((void *)load_address,
+          (const void *)&image_data_flash[sizeof(struct image_header)],
+          image_data_size - sizeof(struct image_header));
+
+    /* Update CRC over data */
+    image_descriptor_data_crc_continue(&computed_data_crc,
+                                      (const u8 *)load_address,
+                                      image_data_size -
+                                      sizeof(struct image_header));
+
+    /* Verify data CRC */
+    if (computed_data_crc != image_descriptor_data_crc_get(image_descriptor)) {
+      if (failsafe) {
+        return -1;
+      } else {
+        failsafe = true;
+        continue;
+      }
+    }
+
+      /* Parse header */
+    spl_image.flags |= SPL_COPY_PAYLOAD_ONLY;
+    spl_parse_image_header(&header);
+
+    /* Determine image table index */
+    u32 image_table_index = 0;
+    bool image_table_index_found = false;
+    const u32 image_set_offsets[] = CONFIG_IMAGE_SET_OFFSETS;
+    int i;
+    for (i=0; i<sizeof(image_set_offsets) / sizeof(image_set_offsets[0]); i++) {
+      if (image_set_offsets[i] == image_set_offset) {
+        image_table_index = i;
+        image_table_index_found = true;
+        break;
+      }
+    }
+    if (!image_table_index_found) {
+      if (failsafe) {
+        return -1;
+      } else {
+        failsafe = true;
+        continue;
+      }
+    }
+
+    /* Write image table index to lower two bits of REBOOT_STATUS */
+    u32 reboot_status = readl(REG_REBOOT_STATUS);
+    reboot_status = (reboot_status & ~0x3) | (image_table_index & 0x3);
+    zynq_slcr_unlock();
+    writel(reboot_status, REG_REBOOT_STATUS);
+    zynq_slcr_lock();
+
+    break;
+  }
 
 #else
   /* SPL */
+  update_boot_fail_count(false);
   struct spi_flash *flash;
   flash = spi_flash_probe(CONFIG_SF_DEFAULT_BUS,
                           CONFIG_SF_DEFAULT_CS,
@@ -681,6 +764,7 @@ int spl_board_load_image(void)
     puts("U-Boot image CRC failure\n");
     return -1;
   }
+  update_boot_fail_count(false);
 #endif
 
   return err;
