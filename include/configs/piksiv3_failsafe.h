@@ -159,6 +159,14 @@
     "mdio write 9 0; " \
     "mdio write 0 0; " \
     "mdio write 0 1000; " \
+    "mdio write 22 2; " \
+    "mdio write 21 3036; " \
+    "mdio write 22 0; " \
+    "mdio write 0 0xa000; " \
+    "mdio write 22 2; " \
+    "mdio write 16 444a; " \
+    "mdio write 22 0; " \
+    "mdio write 0 0xa000; " \
     "sleep 1;\0" \
   "ram_buffer=0x0100000\0" \
   "image_size=0x1c00000\0" \
