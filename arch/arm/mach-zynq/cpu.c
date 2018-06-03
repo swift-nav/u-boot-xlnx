@@ -38,6 +38,18 @@ int arch_cpu_init(void)
 	zynq_clk_early_init();
 	zynq_slcr_lock();
 
+#ifdef  CONFIG_DISABLE_ZYNQ_DEBUG
+
+#define DAP_ENABLE_MASK 0x7F
+#define JTAG_CHAIN_DISABLE 0x00800000
+
+  unsigned int control = readl(&devcfg_base->ctrl);
+  control &= ~DAP_ENABLE_MASK;
+  control |= JTAG_CHAIN_DISABLE;
+
+  writel(control, &devcfg_base->ctrl);
+#endif
+
 	return 0;
 }
 
