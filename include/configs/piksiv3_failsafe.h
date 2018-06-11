@@ -42,6 +42,22 @@
      CONFIG_IMAGE_SET_OFFSET_STANDARD_A,  \
      CONFIG_IMAGE_SET_OFFSET_STANDARD_B}
 
+#define CONFIG_DISABLE_ZYNQ_DEBUG
+
+#define CONFIG_PREBOOT                          \
+  "echo Erasing flash...; "                     \
+  "if sf probe && "                             \
+  "   sf erase 0x0300000 0x1c00000 && "         \
+  "   sf erase 0x2000000 0x1c00000; "           \
+  "then "                                       \
+  "   echo Enabling JTAG...; "                  \
+  "   enable_jtag; "                            \
+  "else "                                       \
+  "   echo Flash erase failed, resetting...; "  \
+  "   sleep 1; "                                \
+  "   reset; "                                  \
+  "fi"
+
 /* CPU clock */
 #ifndef CONFIG_CPU_FREQ_HZ
 # define CONFIG_CPU_FREQ_HZ 800000000
@@ -246,6 +262,8 @@
 #undef CONFIG_BOOTM_NETBSD
 
 #define CONFIG_CMD_IMAGE_SET
+#define CONFIG_CMD_ENABLE_JTAG
+#define CONFIG_CMD_DISABLE_JTAG
 
 #define CONFIG_SYS_HZ     1000
 

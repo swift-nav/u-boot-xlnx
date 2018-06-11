@@ -99,6 +99,8 @@
 
 #define CONFIG_BOOTCOMMAND		""
 
+#define CONFIG_DISABLE_ZYNQ_DEBUG
+
 #define CONFIG_PREBOOT
 #define CONFIG_BOOTDELAY		0 /* -1 to Disable autoboot */
 #define CONFIG_SYS_LOAD_ADDR	0 /* default? */

@@ -86,6 +86,7 @@ endif
 ifdef CONFIG_POST
 obj-$(CONFIG_CMD_DIAG) += cmd_diag.o
 endif
+obj-$(CONFIG_CMD_DISABLE_JTAG) += cmd_disable_jtag.o
 obj-$(CONFIG_CMD_DISPLAY) += cmd_display.o
 obj-$(CONFIG_CMD_DTT) += cmd_dtt.o
 obj-$(CONFIG_CMD_ECHO) += cmd_echo.o
@@ -93,6 +94,7 @@ obj-$(CONFIG_ENV_IS_IN_EEPROM) += cmd_eeprom.o
 obj-$(CONFIG_CMD_EEPROM) += cmd_eeprom.o
 obj-$(CONFIG_EFI_STUB) += cmd_efi.o
 obj-$(CONFIG_CMD_ELF) += cmd_elf.o
+obj-$(CONFIG_CMD_ENABLE_JTAG) += cmd_enable_jtag.o
 obj-$(CONFIG_SYS_HUSH_PARSER) += cmd_exit.o
 obj-$(CONFIG_CMD_EXT4) += cmd_ext4.o
 obj-$(CONFIG_CMD_EXT2) += cmd_ext2.o
