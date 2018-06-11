@@ -42,21 +42,39 @@
      CONFIG_IMAGE_SET_OFFSET_STANDARD_A,  \
      CONFIG_IMAGE_SET_OFFSET_STANDARD_B}
 
-#define CONFIG_DISABLE_ZYNQ_DEBUG
+/*#define CONFIG_DISABLE_ZYNQ_DEBUG*/
 
-#define CONFIG_PREBOOT                          \
-  "echo Erasing flash...; "                     \
-  "if sf probe && "                             \
-  "   sf erase 0x0300000 0x1c00000 && "         \
-  "   sf erase 0x2000000 0x1c00000; "           \
-  "then "                                       \
-  "   echo Enabling JTAG...; "                  \
-  "   enable_jtag; "                            \
-  "else "                                       \
-  "   echo Flash erase failed, resetting...; "  \
-  "   sleep 1; "                                \
-  "   reset; "                                  \
-  "fi"
+#define CONFIG_PREBOOT                                 \
+  "echo Erasing flash...; "                            \
+  "if sf probe                                    && " \
+  "   echo Erasing standard partition A header... && " \
+  "   sf erase 0x0180000 0x0040000                && " \
+  "   echo Erasing standard partition B header... && " \
+  "   sf erase 0x01C0000 0x0040000                && " \
+  "   echo Erasing standard SPL A partition...    && " \
+  "   sf erase 0x0280000 0x0040000                && " \
+  "   echo Erasing standard SPL B partition...    && " \
+  "   sf erase 0x02C0000 0x0040000                && " \
+  "   echo Erasing standard A image partition...  && " \
+  "   sf erase 0x0300000 0x1c00000                && " \
+  "   echo Erasing standard B image partition...  && " \
+  "   sf erase 0x2000000 0x1c00000; "                  \
+  "then "                                              \
+  "   echo Enabling JTAG...; "                         \
+  "   enable_jtag; "                                   \
+  "else "                                              \
+  "   echo Flash erase failed, resetting in 5s...; "   \
+  "   sleep 1; "                                       \
+  "   echo Flash erase failed, resetting in 4s...; "   \
+  "   sleep 1; "                                       \
+  "   echo Flash erase failed, resetting in 3s...; "   \
+  "   sleep 1; "                                       \
+  "   echo Flash erase failed, resetting in 2s...; "   \
+  "   sleep 1; "                                       \
+  "   echo Flash erase failed, resetting in 1s...; "   \
+  "   sleep 1; "                                       \
+  "   reset; "                                         \
+  "fi"                                                 \
 
 /* CPU clock */
 #ifndef CONFIG_CPU_FREQ_HZ
