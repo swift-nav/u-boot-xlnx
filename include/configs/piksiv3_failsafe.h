@@ -63,11 +63,18 @@
   "   echo Enabling JTAG...; "                         \
   "   enable_jtag; "                                   \
   "else "                                              \
-  "   echo Flash erase failed, resetting...; "         \
+  "   echo Flash erase failed, resetting in 5s...; "   \
   "   sleep 1; "                                       \
-  "fi"
-
-/*"   reset; "                                  \*/
+  "   echo Flash erase failed, resetting in 4s...; "   \
+  "   sleep 1; "                                       \
+  "   echo Flash erase failed, resetting in 3s...; "   \
+  "   sleep 1; "                                       \
+  "   echo Flash erase failed, resetting in 2s...; "   \
+  "   sleep 1; "                                       \
+  "   echo Flash erase failed, resetting in 1s...; "   \
+  "   sleep 1; "                                       \
+  "   reset; "                                         \
+  "fi"                                                 \
 
 /* CPU clock */
 #ifndef CONFIG_CPU_FREQ_HZ
