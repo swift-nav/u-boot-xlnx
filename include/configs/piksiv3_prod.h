@@ -98,6 +98,7 @@
     "bootm ${img_tbl_kernel_load_address}\0"
 
 #define CONFIG_BOOTCOMMAND		""
+#define CONFIG_BOOTARGS "console=ttyPS1,115200 earlyprintk=ttyPS1,115200 initcall_debug"
 
 /*#define CONFIG_DISABLE_ZYNQ_DEBUG*/
 
