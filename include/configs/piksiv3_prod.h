@@ -102,12 +102,13 @@
 #define CONFIG_DISABLE_ZYNQ_DEBUG
 
 #define CONFIG_PREBOOT
-#define CONFIG_BOOTDELAY		0 /* -1 to Disable autoboot */
+/*#define CONFIG_BOOTDELAY		0 *//* -1 to Disable autoboot */
+#define CONFIG_BOOTDELAY   1 /* -1 to Disable autoboot */
 #define CONFIG_SYS_LOAD_ADDR	0 /* default? */
 
 /* Miscellaneous configurable options */
-#define CONFIG_DISABLE_CONSOLE
-#define CONFIG_BOARD_EARLY_INIT_F
+/*#define CONFIG_DISABLE_CONSOLE*/
+/*#define CONFIG_BOARD_EARLY_INIT_F*/
 #define CONFIG_BOARD_LATE_INIT
 #define CONFIG_DISPLAY_BOARDINFO
 #define CONFIG_CLOCKS
