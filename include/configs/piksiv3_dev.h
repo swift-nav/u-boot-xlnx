@@ -24,13 +24,13 @@
 /* CRC verfication support */
 #define CONFIG_HASH_VERIFY
 
- /* Factory data */
+/* Factory data */
 #define CONFIG_FACTORY_DATA
 #define CONFIG_FACTORY_DATA_OFFSET 0x00040000U
 #define CONFIG_FACTORY_DATA_FALLBACK
 #define CONFIG_ZYNQ_GEM_FACTORY_ADDR
 
- /* Image table */
+/* Image table */
 #define CONFIG_IMAGE_TABLE_BOOT
 #define CONFIG_IMAGE_TABLE_BOOT_FPGA
 #define CONFIG_IMAGE_SET_OFFSET_FAILSAFE_A 0x00100000U
@@ -58,13 +58,14 @@
 # define CONFIG_SYS_PL310_BASE    0xf8f02000
 #endif
 
+/* Timer */
 #define ZYNQ_SCUTIMER_BASEADDR    0xF8F00600
 #define CONFIG_SYS_TIMERBASE    ZYNQ_SCUTIMER_BASEADDR
 #define CONFIG_SYS_TIMER_COUNTS_DOWN
 #define CONFIG_SYS_TIMER_COUNTER  (CONFIG_SYS_TIMERBASE + 0x4)
 
 /* Serial drivers */
-#define CONFIG_BAUDRATE   115200
+#define CONFIG_BAUDRATE    115200
 /* The following table includes the supported baudrates */
 #define CONFIG_SYS_BAUDRATE_TABLE   {CONFIG_BAUDRATE}
 
@@ -147,7 +148,7 @@
 # define CONFIG_CMD_FS_GENERIC
 #endif
 
-/* Total Size of Environment Sector */
+/* Environment */
 #define CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_SPI_MAX_HZ CONFIG_SF_DEFAULT_SPEED
 #define CONFIG_ENV_SIZE       (256 << 10)
@@ -215,11 +216,10 @@
       "sleep 1 && " \
       "mmcinfo;\0"
 
-/* Default environment */
 #define CONFIG_BOOTCOMMAND "run fpgaload; run sdboot; run netboot"
 #define CONFIG_BOOTARGS "console=ttyPS1,115200"
 
-#define CONFIG_BOOTDELAY    1 /* -1 to Disable autoboot */
+#define CONFIG_BOOTDELAY        1 /* -1 to Disable autoboot */
 #define CONFIG_SYS_LOAD_ADDR    0 /* default? */
 
 /* Miscellaneous configurable options */
@@ -231,28 +231,28 @@
 #define CONFIG_SYS_LONGHELP
 #define CONFIG_CLOCKS
 #define CONFIG_CMD_CLK
-#define CONFIG_SYS_MAXARGS    32 /* max number of command args */
-#define CONFIG_SYS_CBSIZE   2048 /* Console I/O Buffer Size */
-#define CONFIG_SYS_PBSIZE   (CONFIG_SYS_CBSIZE + \
-          sizeof(CONFIG_SYS_PROMPT) + 16)
+#define CONFIG_SYS_MAXARGS      32 /* max number of command args */
+#define CONFIG_SYS_CBSIZE       2048 /* Console I/O Buffer Size */
+#define CONFIG_SYS_PBSIZE       (CONFIG_SYS_CBSIZE + \
+                                       sizeof(CONFIG_SYS_PROMPT) + 16)
 
 /* Physical Memory map */
-#define CONFIG_SYS_TEXT_BASE    0x4000000
-#define CONFIG_SYS_UBOOT_START  CONFIG_SYS_TEXT_BASE
+#define CONFIG_SYS_TEXT_BASE        0x4000000
+#define CONFIG_SYS_UBOOT_START      CONFIG_SYS_TEXT_BASE
 
-#define CONFIG_NR_DRAM_BANKS    1
-#define CONFIG_SYS_SDRAM_BASE   0
+#define CONFIG_NR_DRAM_BANKS        1
+#define CONFIG_SYS_SDRAM_BASE       0
 
-#define CONFIG_SYS_MEMTEST_START  CONFIG_SYS_SDRAM_BASE
-#define CONFIG_SYS_MEMTEST_END    (CONFIG_SYS_SDRAM_BASE + 0x1000)
+#define CONFIG_SYS_MEMTEST_START    CONFIG_SYS_SDRAM_BASE
+#define CONFIG_SYS_MEMTEST_END      (CONFIG_SYS_SDRAM_BASE + 0x1000)
 
-#define CONFIG_SYS_MALLOC_LEN   0xC00000
+#define CONFIG_SYS_MALLOC_LEN       0xC00000
 
-#define CONFIG_SYS_INIT_RAM_ADDR  0xFFFF0000
-#define CONFIG_SYS_INIT_RAM_SIZE  0x1000
-#define CONFIG_SYS_INIT_SP_ADDR   (CONFIG_SYS_INIT_RAM_ADDR + \
-          CONFIG_SYS_INIT_RAM_SIZE - \
-          GENERATED_GBL_DATA_SIZE)
+#define CONFIG_SYS_INIT_RAM_ADDR    0xFFFF0000
+#define CONFIG_SYS_INIT_RAM_SIZE    0x1000
+#define CONFIG_SYS_INIT_SP_ADDR     (CONFIG_SYS_INIT_RAM_ADDR + \
+                                   CONFIG_SYS_INIT_RAM_SIZE - \
+                                   GENERATED_GBL_DATA_SIZE)
 
 /* Enable the PL to be downloaded */
 #define CONFIG_FPGA
@@ -273,12 +273,10 @@
 #define CONFIG_DISPLAY_BOARDINFO_LATE
 
 /* Extend size of kernel image for uncompression */
-#define CONFIG_SYS_BOOTM_LEN  (60 * 1024 * 1024)
+#define CONFIG_SYS_BOOTM_LEN    (60 * 1024 * 1024)
 
 /* Boot FreeBSD/vxWorks from an ELF image */
 #define CONFIG_SYS_MMC_MAX_DEVICE 1
-
-#define CONFIG_SYS_LDSCRIPT  "arch/arm/mach-zynq/u-boot.lds"
 
 /* Commands */
 #ifdef CONFIG_SYS_ENET
@@ -304,7 +302,7 @@
 
 #define CONFIG_CMD_IMAGE_SET
 
-#define CONFIG_SYS_HZ     1000
+#define CONFIG_SYS_HZ           1000
 
 /* For development/debugging */
 #ifdef DEBUG
@@ -354,7 +352,42 @@
 #define CONFIG_SYS_MMCSD_RAW_MODE_ARGS_SECTORS  0
 #define CONFIG_SYS_MMCSD_RAW_MODE_KERNEL_SECTOR 0
 
-/* qspi mode is working fine */
+#ifdef DEBUG
+#define CONFIG_SPL_RAM_DEVICE
+#define CONFIG_SPL_NET_SUPPORT
+#define CONFIG_SPL_ETH_SUPPORT
+#define CONFIG_SPL_ENV_SUPPORT
+#define CONFIG_SPL_ETH_DEVICE "Gem.e000b000"
+#endif
+
+/* SPL code */
+/* Workaround for TPL icache issue: Do not place code in lower 40kB */
+
+#define CONFIG_SYS_LDSCRIPT  "arch/arm/mach-zynq/u-boot.lds"
+
+#define CONFIG_SPL_TEXT_BASE              0x0000a000
+#define CONFIG_SPL_MAX_SIZE               0x00026000
+
+/* The highest 64k OCM address */
+#define OCM_HIGH_ADDR                     0xffff0000
+#define CONFIG_SYS_SPL_MALLOC_START       OCM_HIGH_ADDR
+#define CONFIG_SYS_SPL_MALLOC_SIZE        0x00002000
+
+/*
+ * SPL stack position - and stack goes down
+ * 0xfffffe00 is used for putting wfi loop.
+ * Set it up as limit for now.
+ */
+#define CONFIG_SPL_STACK                  0xfffffe00
+
+/* BSS setup */
+#define CONFIG_SPL_BSS_START_ADDR         0x03000000
+#define CONFIG_SPL_BSS_MAX_SIZE           0x00100000
+
+/* for booting directly linux */
+#define CONFIG_SPL_OS_BOOT
+
+/* QSPI support */
 #ifdef CONFIG_ZYNQ_QSPI
 #define CONFIG_SPL_SPI_SUPPORT
 #define CONFIG_SPL_SPI_LOAD
@@ -366,41 +399,7 @@
           CONFIG_SYS_SPI_ARGS_SIZE)
 #endif
 
-#ifdef DEBUG
-#define CONFIG_SPL_RAM_DEVICE
-#define CONFIG_SPL_NET_SUPPORT
-#define CONFIG_SPL_ETH_SUPPORT
-#define CONFIG_SPL_ENV_SUPPORT
-#define CONFIG_SPL_ETH_DEVICE "Gem.e000b000"
-#endif
-
 /* Use image table */
 #define CONFIG_SPL_BOARD_LOAD_IMAGE
-
-/* for booting directly linux */
-#define CONFIG_SPL_OS_BOOT
-
-/* SPL code */
-/* Workaround for TPL icache issue: Do not place code in lower 40kB */
-#define CONFIG_SPL_TEXT_BASE      0x0000a000
-#define CONFIG_SPL_MAX_SIZE       0x00026000
-
-/* The highest 64k OCM address */
-#define OCM_HIGH_ADDR 0xffff0000
-
-/* On the top of OCM space */
-#define CONFIG_SYS_SPL_MALLOC_START OCM_HIGH_ADDR
-#define CONFIG_SYS_SPL_MALLOC_SIZE  0x2000
-
-/*
- * SPL stack position - and stack goes down
- * 0xfffffe00 is used for putting wfi loop.
- * Set it up as limit for now.
- */
-#define CONFIG_SPL_STACK  0xfffffe00
-
-/* BSS setup */
-#define CONFIG_SPL_BSS_START_ADDR 0x3000000
-#define CONFIG_SPL_BSS_MAX_SIZE   0x100000
 
 #endif /* __CONFIG_PIKSIV3_DEV_H */
