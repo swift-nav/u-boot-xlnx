@@ -41,23 +41,23 @@
 
 /* CPU clock */
 #ifndef CONFIG_CPU_FREQ_HZ
-# define CONFIG_CPU_FREQ_HZ 800000000
+# define CONFIG_CPU_FREQ_HZ              800000000
 #endif
 
 /* Cache options */
 #define CONFIG_CMD_CACHE
-#define CONFIG_SYS_CACHELINE_SIZE 32
+#define CONFIG_SYS_CACHELINE_SIZE        32
 
 /* Timer */
-#define ZYNQ_SCUTIMER_BASEADDR    0xF8F00600
-#define CONFIG_SYS_TIMERBASE    ZYNQ_SCUTIMER_BASEADDR
+#define ZYNQ_SCUTIMER_BASEADDR           0xF8F00600
+#define CONFIG_SYS_TIMERBASE             ZYNQ_SCUTIMER_BASEADDR
 #define CONFIG_SYS_TIMER_COUNTS_DOWN
-#define CONFIG_SYS_TIMER_COUNTER  (CONFIG_SYS_TIMERBASE + 0x4)
+#define CONFIG_SYS_TIMER_COUNTER         (CONFIG_SYS_TIMERBASE + 0x4)
 
 /* Serial drivers */
-#define CONFIG_BAUDRATE    115200
+#define CONFIG_BAUDRATE                  115200
 /* The following table includes the supported baudrates */
-#define CONFIG_SYS_BAUDRATE_TABLE   {CONFIG_BAUDRATE}
+#define CONFIG_SYS_BAUDRATE_TABLE        {CONFIG_BAUDRATE}
 
 #define CONFIG_ARM_DCC
 #define CONFIG_ZYNQ_SERIAL
