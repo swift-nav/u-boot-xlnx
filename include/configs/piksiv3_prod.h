@@ -190,9 +190,6 @@
 
 #define CONFIG_SPL_STACK                  0xfffffe00
 
-/* Use image table */
-#define CONFIG_SPL_BOARD_LOAD_IMAGE
-
 #else
 
 /* SPL is loaded to low OCM, no relocation */
@@ -227,9 +224,9 @@
 #define CONFIG_SPL_SPI_FLASH_SUPPORT
 #define CONFIG_SYS_SPI_U_BOOT_OFFS        0x00100000
 
+#endif
+
 /* Use image table */
 #define CONFIG_SPL_BOARD_LOAD_IMAGE
-
-#endif
 
 #endif /* __CONFIG_PIKSIV3_PROD_H */

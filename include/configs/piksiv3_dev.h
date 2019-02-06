@@ -278,6 +278,8 @@
 /* Boot FreeBSD/vxWorks from an ELF image */
 #define CONFIG_SYS_MMC_MAX_DEVICE 1
 
+#define CONFIG_SYS_LDSCRIPT  "arch/arm/mach-zynq/u-boot.lds"
+
 /* Commands */
 #ifdef CONFIG_SYS_ENET
 # define CONFIG_CMD_PING
@@ -317,8 +319,6 @@
 #define CONFIG_SPL_LIBGENERIC_SUPPORT
 #define CONFIG_SPL_SERIAL_SUPPORT
 #define CONFIG_SPL_BOARD_INIT
-
-#define CONFIG_SPL_LDSCRIPT "arch/arm/mach-zynq/u-boot-spl.lds"
 
 /* MMC support */
 #ifdef CONFIG_ZYNQ_SDHCI0
@@ -363,7 +363,7 @@
 /* SPL code */
 /* Workaround for TPL icache issue: Do not place code in lower 40kB */
 
-#define CONFIG_SYS_LDSCRIPT  "arch/arm/mach-zynq/u-boot.lds"
+#define CONFIG_SPL_LDSCRIPT "arch/arm/mach-zynq/u-boot-spl.lds"
 
 #define CONFIG_SPL_TEXT_BASE              0x0000a000
 #define CONFIG_SPL_MAX_SIZE               0x00026000
