@@ -157,6 +157,11 @@
 
 /* Default environment */
 #define CONFIG_EXTRA_ENV_SETTINGS \
+  "env_version_major=0\0" \
+  "env_version_minor=1\0" \
+  "env_version_minor_minor=0\0" \
+  "pre_boot_counter=0\0" \
+  "post_boot_counter=0\0" \
   "kernel_image=uImage.piksiv3_" PIKSI_REV "\0" \
   "kernel_load_address=0x08008000\0" \
   "fpga_load_address=0x02000000\0" \
@@ -213,10 +218,14 @@
                "${img_tbl_fpga_size} && " \
       "fpga loadb 0 ${fpga_load_address} ${img_tbl_fpga_size} && " \
       "sleep 1 && " \
-      "mmcinfo;\0"
+      "mmcinfo;\0" \
+    "pre_load_tasks=" \
+      "run increment_boot_counter;\0" \
+    "increment_boot_counter=" \
+      "setexpr pre_boot_counter ${pre_boot_counter} + 1; saveenv;\0" \
 
 /* Default environment */
-#define CONFIG_BOOTCOMMAND "run fpgaload; run sdboot; run netboot"
+#define CONFIG_BOOTCOMMAND "run pre_load_tasks; run fpgaload; run sdboot; run netboot"
 #define CONFIG_BOOTARGS "console=ttyPS1,115200"
 
 #define CONFIG_BOOTDELAY    1 /* -1 to Disable autoboot */
