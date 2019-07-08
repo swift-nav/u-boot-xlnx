@@ -42,7 +42,7 @@
      CONFIG_IMAGE_SET_OFFSET_STANDARD_A,  \
      CONFIG_IMAGE_SET_OFFSET_STANDARD_B}
 
-#define CONFIG_DISABLE_ZYNQ_DEBUG
+/* #define CONFIG_DISABLE_ZYNQ_DEBUG */
 
 #define CONFIG_PREBOOT                                 \
   "echo Erasing flash...; "                            \
