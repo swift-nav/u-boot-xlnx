@@ -185,6 +185,9 @@
     "mdio write 16 0x444a; " \ /* MAC Specific Control Register 1: just writes 1 to a reserved bit which specifically says not to do this? */
     "mdio write 22 0; " \      /* Page Address: select page 0 */
     "mdio write 0 0xa000; " \  /* Copper Control Register: do copper software reset, speed select LSB 100Mbps, disable auto-negotiation  */
+    "mdio write 22 0; " \      /* Page Address: select page 0 */
+    "mdio write 0 0x1800; " \  /* Copper Control Register: enable auto-negotiation, power down chip */
+    "mdio write 0 0xa800; " \  /* Copper Control Register: do copper software reset, power down chip, speed select LSB 100Mbps, disable auto-negotiation */
     "sleep 1;\0" \
   "sdboot=" \
     "if mmcinfo; then " \

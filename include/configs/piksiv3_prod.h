@@ -78,17 +78,20 @@
 /* Default environment */
 #define CONFIG_EXTRA_ENV_SETTINGS	\
   "net_disable_gigabit=" \
-    "mdio write 9 0; " \        /* 100BASE-T Control Register: set automatic master/slave configuration */
-    "mdio write 0 0; " \        /* Copper Control Register: set speed selection LSB to 1000/10 Mbps, set copper duplex mode to half duplex, disable auto-negotiation */
-    "mdio write 0 0x1000; " \   /* Copper Control Register: enable auto-negotiation */
-    "mdio write 22 2; " \       /* Page Address: select page 2 */
-    "mdio write 21 0x3036; " \  /* MAC Specific Control Register 2: set default MAC interface speed LSB to 100Mbps, set reserved bits to default, set default MAC interface speed MSB to 100Mbps */
-    "mdio write 22 0; " \       /* Page Address: select page 0 */
-    "mdio write 0 0xa000; " \   /* Copper Control Register: do copper software reset, speed select LSB 100Mbps, disable auto-negotiation */
-    "mdio write 22 2; " \       /* Page Address: select page 2 */
-    "mdio write 16 0x444a; " \  /* MAC Specific Control Register 1: just writes 1 to a reserved bit which specifically says not to do this? */
-    "mdio write 22 0; " \       /* Page Address: select page 0 */
-    "mdio write 0 0xa000\0" \   /* Copper Control Register: do copper software reset, speed select LSB 100Mbps, disable auto-negotiation  */
+    "mdio write 9 0; " \       /* 100BASE-T Control Register: set automatic master/slave configuration */
+    "mdio write 0 0; " \       /* Copper Control Register: set speed selection LSB to 1000/10 Mbps, set copper duplex mode to half duplex, disable auto-negotiation */
+    "mdio write 0 0x1000; " \  /* Copper Control Register: enable auto-negotiation */
+    "mdio write 22 2; " \      /* Page Address: select page 2 */
+    "mdio write 21 0x3036; " \ /* MAC Specific Control Register 2: set default MAC interface speed LSB to 100Mbps, set reserved bits to default, set default MAC interface speed MSB to 100Mbps */
+    "mdio write 22 0; " \      /* Page Address: select page 0 */
+    "mdio write 0 0xa000; " \  /* Copper Control Register: do copper software reset, speed select LSB 100Mbps, disable auto-negotiation */
+    "mdio write 22 2; " \      /* Page Address: select page 2 */
+    "mdio write 16 0x444a; " \ /* MAC Specific Control Register 1: just writes 1 to a reserved bit which specifically says not to do this? */
+    "mdio write 22 0; " \      /* Page Address: select page 0 */
+    "mdio write 0 0xa000; " \  /* Copper Control Register: do copper software reset, speed select LSB 100Mbps, disable auto-negotiation  */
+    "mdio write 22 0; " \      /* Page Address: select page 0 */
+    "mdio write 0 0x1800; " \  /* Copper Control Register: enable auto-negotiation, power down chip */
+    "mdio write 0 0xa800\0" \  /* Copper Control Register: do copper software reset, power down chip, speed select LSB 100Mbps, disable auto-negotiation */
   "preboot=run net_disable_gigabit && run img_tbl_boot\0" \
   "img_tbl_boot=" \
     "sf probe && " \
