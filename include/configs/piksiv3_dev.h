@@ -190,14 +190,6 @@
     "mdio write 9 0; " \
     "mdio write 0 0; " \
     "mdio write 0 0x1000; " \
-    "mdio write 22 2; " \
-    "mdio write 21 0x3036; " \
-    "mdio write 22 0; " \
-    "mdio write 0 0xa000; " \
-    "mdio write 22 2; " \
-    "mdio write 16 0x444a; " \
-    "mdio write 22 0; " \
-    "mdio write 0 0xa000; " \
     "sleep 1;\0" \
   "sdboot=" \
     "if mmcinfo; then " \
