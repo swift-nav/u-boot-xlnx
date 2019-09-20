@@ -91,10 +91,6 @@
     "mdio write 22 2; " \
     "mdio write 21 0x3036; " \
     "mdio write 22 0; " \
-    "mdio write 0 0xa000; " \
-    "mdio write 22 2; " \
-    "mdio write 16 0x444a; " \
-    "mdio write 22 0; " \
     "mdio write 0 0xa000\0" \
   "preboot=run net_disable_gigabit && run img_tbl_boot\0" \
   "img_tbl_boot=" \
