@@ -78,24 +78,23 @@
 /* Default environment */
 /* Ethernet PHY register writes:
  * Page Address: select page 2
- * MAC Specific Control Register 2: set default MAC interface speed LSB to 100Mbps, set reserved bits to default, set default MAC interface speed MSB to 100Mbps
+ * MAC Specific Control Register 2: set default MAC interface speed LSB to 10Mbps, set reserved bits to default, set default MAC interface speed MSB to 10Mbps
  * Page Address: select page 0
- * Copper Control Register: do copper software reset, speed select LSB 100Mbps, disable auto-negotiation
+ * Copper Control Register: do copper software reset, speed select LSB 10Mbps, disable auto-negotiation
  * Page Address: select page 2
  * MAC Specific Control Register 1: just writes 1 to a reserved bit which specifically says not to do this?
  * Page Address: select page 0
- * Copper Control Register: do copper software reset, speed select LSB 100Mbps, disable auto-negotiation 
- */
+ * Copper Control Register: do copper software reset, speed select LSB 10Mbps, disable auto-negotiation */
 #define CONFIG_EXTRA_ENV_SETTINGS	\
   "net_disable_gigabit=" \
     "mdio write 22 2; " \
-    "mdio write 21 0x3036; " \
+    "mdio write 21 0x1036; " \
     "mdio write 22 0; " \
-    "mdio write 0 0xa000; " \
+    "mdio write 0 0x8000; " \
     "mdio write 22 2; " \
     "mdio write 16 0x444a; " \
     "mdio write 22 0; " \
-    "mdio write 0 0xa000\0" \
+    "mdio write 0 0x8000\0" \
   "preboot=run net_disable_gigabit && run img_tbl_boot\0" \
   "img_tbl_boot=" \
     "sf probe && " \
