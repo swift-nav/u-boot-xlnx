@@ -77,9 +77,6 @@
 
 /* Default environment */
 /* Ethernet PHY register writes:
- * 100BASE-T Control Register: set automatic master/slave configuration 
- * Copper Control Register: set speed selection LSB to 1000/10 Mbps, set copper duplex mode to half duplex, disable auto-negotiation
- * Copper Control Register: enable auto-negotiation
  * Page Address: select page 2
  * MAC Specific Control Register 2: set default MAC interface speed LSB to 100Mbps, set reserved bits to default, set default MAC interface speed MSB to 100Mbps
  * Page Address: select page 0
@@ -94,9 +91,6 @@
  */
 #define CONFIG_EXTRA_ENV_SETTINGS	\
   "net_disable_gigabit=" \
-    "mdio write 9 0; " \
-    "mdio write 0 0; " \
-    "mdio write 0 0x1000; " \
     "mdio write 22 2; " \
     "mdio write 21 0x3036; " \
     "mdio write 22 0; " \
